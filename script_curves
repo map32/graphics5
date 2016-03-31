@@ -1,0 +1,23 @@
+circle
+250 250 200
+display
+circle
+175 325 50
+display
+circle
+325 325 50
+display
+circle
+175 325 10
+display
+circle
+325 325 10
+display
+hermite
+150 150 150 50 350 150 350 300
+display
+bezier
+200 250 150 50 300 250 300 250
+display
+quit
+
