@@ -93,15 +93,15 @@ Returns:
 turns m in to an identity matrix
 */
 void ident(struct matrix *m) {
-
-  int r, c;
-  for (r=0; r < m->rows; r++) {
-    for (c=0; c < m->cols; c++)  {
-
-      if ( r == c )
-	m->m[r][c] = 1;
-      else
-	m->m[r][c] = 0;
+  int i = 0;
+  for(i;i<m->rows;i++){
+    int j = 0;
+    for(j;j<m->cols;j++){
+      if (i == j){
+	m->m[i][j] = 1;
+      } else {
+	m->m[i][j] = 0;
+      }
     }
   }
 }
@@ -115,14 +115,13 @@ Returns:
 multiply each element of m by x
 */
 void scalar_mult(double x, struct matrix *m) {
-
-  int r, c;
-  for (r=0; r < m->rows; r++) 
-    for (c=0; c < m->cols; c++)  {
-      
-      double t = m->m[r][c];
-      m->m[r][c] = t * x;
+  int i = 0;
+  for(i;i<m->rows;i++){
+    int j = 0;
+    for(j;j<m->cols;j++){
+      m->m[i][j] *= x;
     }
+  }
 }
 
 
@@ -134,25 +133,28 @@ Returns:
 a*b -> b
 */
 void matrix_mult(struct matrix *a, struct matrix *b) {
-  int r, c;
-  struct matrix * tmp;
-  
-  tmp = new_matrix(4, 1);
-  
-  for (c=0; c < b->cols; c++)  {
-    for (r=0; r < 4; r++) 
-      tmp->m[r][0] = b->m[r][c];
-
-    for (r=0; r < 4; r++) {
-      b->m[r][c] =  a->m[r][0] * tmp->m[0][0] + 
-	a->m[r][1] * tmp->m[1][0] +
-	a->m[r][2] * tmp->m[2][0] +
-	a->m[r][3] * tmp->m[3][0];
+  if (a->cols != b->rows){
+	printf("invalid multiplication");
+	return;
+  }
+  int i = 0;
+  struct matrix *n;
+  n = new_matrix(a->rows,b->cols);
+  for(i;i<b->cols;i++){
+    int j = 0;
+    for(j;j<a->rows;j++){
+      double s = 0;
+      int k = 0;
+      for(k;k<b->rows;k++){
+	s += a->m[j][k] * b->m[k][i];
+      }
+      n->m[j][i] = s;
     }
   }
-  
-  free_matrix(tmp);
+  copy_matrix(n,b);
+  free_matrix(n);
 }
+
 
 
 

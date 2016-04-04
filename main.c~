@@ -22,6 +22,6 @@ int main( int argc, char **argv ) {
   else
     parse_file( "stdin", transform, edges, s );
   
-  if(transform) free_matrix( transform );
-  if(edges) free_matrix( edges );
+  if(transform!=0) free_matrix( transform );
+  if(edges!=0) free_matrix( edges );
 }  

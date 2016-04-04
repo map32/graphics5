@@ -31,6 +31,9 @@ void add_polygon( struct matrix *polygons,
 		  double x0, double y0, double z0, 
 		  double x1, double y1, double z1, 
 		  double x2, double y2, double z2 ) {
+	add_point(polygons,x0,y0,z0);
+	add_point(polygons,x1,y1,z1);
+	add_point(polygons,x2,y2,z2);
 }
 
 /*======== void draw_polygons() ==========
@@ -46,6 +49,10 @@ triangles
 jdyrlandweaver
 ====================*/
 void draw_polygons( struct matrix *polygons, screen s, color c ) {
+	int i=0;
+	for(i;i+2<polygons->lastcol;i+=3){
+		add_polygon(polygons,polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],);	
+	}
 }
 
 /*======== void add_sphere() ==========
@@ -245,13 +252,14 @@ void add_circle( struct matrix * points,
 		 double r, double step ) {
   double x , y, t;
   double i;
-  int x0 = cx;
-  int y0 = r+cy;
-  for(i=step;i<=1.;i+=step){
+  double x0 = cx;
+  double y0 = r+cy;
+  for(i=step;i<1;i+=step){
     t = 2*M_PI*i;
     x = r*sin(t)+cx;
     y = r*cos(t)+cy;
     add_edge(points,x0,y0,0,x,y,0);
+    //printf("%lf %lf %lf %lf\n",x0,y0,x,y);
     x0 = x;
     y0 = y;
   }
@@ -294,19 +302,18 @@ void add_curve( struct matrix *points,
     double s2 = (y2-y3)/(x2-x3);
     if(x1==x0){
       if(y1>y0){
-	s1 = y1-y0;
-      } else {
 	s1 = y0-y1;
+      } else {
+	s1 = y1-y0;
       }
     }
     if(x3==x2){
       if(y3>y2){
-	s2 = y2-y3;
-      } else {
 	s2 = y3-y2;
+      } else {
+	s2 = y2-y3;
       }
     }
-    //printf("%lf %lf %lf %lf %lf %lf %lf %lf all of thse\n",y1,y0,x1,x0,y3,y2,x3,x2);
     xcfs = generate_curve_coefs(x0,x2,s1,s2,0);
     ycfs = generate_curve_coefs(y0,y2,s1,s2,0);
   } else { //bezzy
@@ -317,14 +324,10 @@ void add_curve( struct matrix *points,
   for(i=step;i<1;i+=step){
       x = ((xcfs->m[0][0]*i+xcfs->m[1][0])*i+xcfs->m[2][0])*i+xcfs->m[3][0];
       y = ((ycfs->m[0][0]*i+ycfs->m[1][0])*i+ycfs->m[2][0])*i+ycfs->m[3][0];
-      //print_matrix(xcfs);
-      //print_matrix(ycfs);
       add_edge(points,xs,ys,0,x,y,0);
       xs = x;
       ys = y;
     }
-  //add_edge(points,xs,ys,0,x3,y3,0);
-    //printf("\n");
 }
 
 /*======== void add_point() ==========
@@ -336,15 +339,16 @@ Returns:
 adds point (x, y, z) to points and increment points.lastcol
 if points is full, should call grow on points
 ====================*/
-void add_point( struct matrix * points, int x, int y, int z) {
+void add_point( struct matrix * points, double x, double y, double z) {
   if (points->lastcol == points->cols){
     grow_matrix(points, (points->cols)*2);
   }
-  points->m[0][points->lastcol+1] = x;
-  points->m[1][points->lastcol+1] = y;
-  points->m[2][points->lastcol+1] = z;
-  points->m[3][points->lastcol+1] = 1;
-  points->lastcol += 1;
+  points->m[0][points->lastcol] = x;
+  points->m[1][points->lastcol] = y;
+  points->m[2][points->lastcol] = z;
+  points->m[3][points->lastcol] = 1;
+  points->lastcol++;
+  //printf("%lf %lf %lf %lf %d\n",x,y,z,points->lastcol);
 }
 
 /*======== void add_edge() ==========
@@ -372,7 +376,7 @@ to the screen
 
 void draw_lines( struct matrix * points, screen s, color c) {
   int i=0;
-  for(i;i<points->lastcol;i+=2){
+  for(i;i<points->lastcol-1;i+=2){
     draw_line(points->m[0][i],points->m[1][i],points->m[0][i+1],points->m[1][i+1],s,c);
   }
 }	       

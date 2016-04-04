@@ -345,7 +345,6 @@ struct matrix * generate_curve_coefs( double p1, double p2,
   pointsayshi->m[1][0] = p2;
   pointsayshi->m[2][0] = p3;
   pointsayshi->m[3][0] = p4;
-  print_matrix(pointsayshi);
   if (type==0){ //hermit
     matrix_mult(make_hermite(),pointsayshi);
   } else { //bezzy
