@@ -124,7 +124,7 @@ void parse_file ( char * filename,
     } else if (strcmp(line, "display")==0){
       //printf("fdssdfsf");
       clear_screen(s);
-      draw_lines(pm,s,c);
+      draw_polygons(pm,s,c);
       display(s);
     } else if (strcmp(line, "save")==0){
       type = 9;
@@ -172,17 +172,17 @@ void parse_file ( char * filename,
         break;
       case 9:
 	//printf("dfg");
-	draw_lines(pm,s,c);
+	draw_polygons(pm,s,c);
 	save_extension(s,line);
 	break;
       case 11:
-        add_sphere(pm,args[0],args[1],args[2],0.01);
+        add_sphere(pm,args[0],args[1],args[2],0.05);
         break;
       case 12:
 	add_box(pm,args[0],args[1],args[2],args[3],args[4],args[5]);
         break;
       case 13:
-        add_torus(pm,args[0],args[1],args[2],args[3],0.01);
+        add_torus(pm,args[0],args[1],args[2],args[3],0.1);
         break;
       default:
 	printf("invalid command/n");

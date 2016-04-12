@@ -3,11 +3,11 @@ box
 0 0 0 200 100 400
 ident
 xrotate
-20
+30
 yrotate
-20
+10
 translate
-150 200 0
+300 300 0
 apply
 display
 #clear the edge matrix, test the sphere

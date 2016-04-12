@@ -50,8 +50,26 @@ jdyrlandweaver
 ====================*/
 void draw_polygons( struct matrix *polygons, screen s, color c ) {
 	int i=0;
+	int nx,ny,nz;
+	int ax,ay,az;
+	int bx,by,bz;
+	int dot;
 	for(i;i+2<polygons->lastcol;i+=3){
-		add_polygon(polygons,polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],polygons->m[0][i],);	
+	  ax = polygons->m[0][i+1]-polygons->m[0][i];
+	  ay = polygons->m[1][i+1]-polygons->m[1][i];
+	  az = polygons->m[2][i+1]-polygons->m[2][i];
+	  bx = polygons->m[0][i+2]-polygons->m[0][i];
+	  by = polygons->m[1][i+2]-polygons->m[1][i];
+	  bz = polygons->m[2][i+2]-polygons->m[2][i];
+	  nx = ay*bz-by*az;
+	  ny = az*bx-ax*bz;
+	  nz = ax*by-bx*ay;
+	  dot = nx*0+ny*0+nz*-1;
+	  if (dot > 0){
+	  draw_line(polygons->m[0][i],polygons->m[1][i],polygons->m[0][i+1],polygons->m[1][i+1],s,c);
+	  draw_line(polygons->m[0][i+1],polygons->m[1][i+1],polygons->m[0][i+2],polygons->m[1][i+2],s,c);
+	  draw_line(polygons->m[0][i+2],polygons->m[1][i+2],polygons->m[0][i],polygons->m[1][i],s,c);
+	  }
 	}
 }
 
@@ -76,11 +94,18 @@ void add_sphere( struct matrix * points,
 		 double step ) {
   struct matrix * pts;
   pts = new_matrix(4,100);
+  int n = (int)(1/step);
   generate_sphere(pts,cx,cy,r,step);
-  int i=0;
-  for(i=0;i<pts->lastcol-1;i+=2){
-    add_edge(points,pts->m[0][i],pts->m[1][i],pts->m[2][i],
-	     pts->m[0][i+1],pts->m[1][i+1],pts->m[2][i+1]);
+  printf("%d is the spere step\n",n);
+  int i;
+  int j;
+  for(i=0;i<n+1;i++){
+    int k;
+    for(j=0;j<n;j++){
+      k = i*n+j;
+    add_polygon(points,pts->m[0][k],pts->m[1][k],pts->m[2][k],pts->m[0][k+n],pts->m[1][k+n],pts->m[2][k+n],pts->m[0][k+n+1],pts->m[1][k+n+1],pts->m[2][k+n+1]);
+    add_polygon(points,pts->m[0][k],pts->m[1][k],pts->m[2][k],pts->m[0][k+1],pts->m[1][k+1],pts->m[2][k+1],pts->m[0][k+n+1],pts->m[1][k+n+1],pts->m[2][k+n+1]);
+    }
   }
   free_matrix(pts);
 }
@@ -107,12 +132,8 @@ void generate_sphere( struct matrix * points,
   double a=0;
   double b=0;
   double x,y,z;
-  x = r*cos(M_PI*2*b)+cx;
-  y = r*sin(M_PI*2*b)*cos(M_PI*a)+cy;
-  z = r*sin(M_PI*2*b)*sin(M_PI*a);
-  for(a=step;a<1+step;a+=step){
-    for(b=step;b<1+step;b+=step){
-      add_point(points,x,y,z);
+  for(a=0;a<1+step;a+=step){
+    for(b=0;b<1+step;b+=step){
       x = r*cos(M_PI*2*b)+cx;
       y = r*sin(M_PI*2*b)*cos(M_PI*a)+cy;
       z = r*sin(M_PI*2*b)*sin(M_PI*a);
@@ -145,10 +166,23 @@ void add_torus( struct matrix * points,
   struct matrix * pts;
   pts = new_matrix(4,100);
   generate_torus(pts,cx,cy,r1,r2,step);
-  int i=0;
+  /**int i=0;
   for(i=0;i<pts->lastcol-1;i+=2){
     add_edge(points,pts->m[0][i],pts->m[1][i],pts->m[2][i],
 	     pts->m[0][i+1],pts->m[1][i+1],pts->m[2][i+1]);
+  }
+  free_matrix(pts);
+  **/
+  int i;
+  int j;
+  int n = (int)(1/step);
+  for(i=0;i<=n+1;i++){
+    int k;
+    for(j=0;j<=n+1;j++){
+      k = i*n+j;
+    add_polygon(points,pts->m[0][k],pts->m[1][k],pts->m[2][k],pts->m[0][k+n],pts->m[1][k+n],pts->m[2][k+n],pts->m[0][k+n+1],pts->m[1][k+n+1],pts->m[2][k+n+1]);
+    add_polygon(points,pts->m[0][k],pts->m[1][k],pts->m[2][k],pts->m[0][k+1],pts->m[1][k+1],pts->m[2][k+1],pts->m[0][k+n+1],pts->m[1][k+n+1],pts->m[2][k+n+1]);
+    }
   }
   free_matrix(pts);
 }
@@ -174,26 +208,8 @@ void generate_torus( struct matrix * points,
   double a=0;
   double b=0;
   double x,y,z;
-  x = r1*cos(M_PI*2*b)+cx;
-  y = cos(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2)+cy;
-  z = sin(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2);
-  for(a=step;a<1;a+=step){
-    for(b=step;b<1;b+=step){
-      add_point(points,x,y,z);
-      x = r1*cos(M_PI*2*b)+cx;
-      y = cos(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2)+cy;
-      z = sin(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2);
-      add_point(points,x,y,z);
-    }
-  }
-  a=0;
-  b=0;
-  x = r1*cos(M_PI*2*b)+cx;
-  y = cos(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2)+cy;
-  z = sin(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2);
-  for(b=step;b<1;b+=step){
-    for(a=step;a<1;a+=step){
-      add_point(points,x,y,z);
+  for(a=0;a<=1+step;a+=step){
+    for(b=0;b<=1+step;b+=step){
       x = r1*cos(M_PI*2*b)+cx;
       y = cos(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2)+cy;
       z = sin(M_PI*2*a)*(r1*sin(M_PI*2*b)+r2);
@@ -221,18 +237,19 @@ void generate_torus( struct matrix * points,
 void add_box( struct matrix * points,
 	      double x, double y, double z,
 	      double width, double height, double depth ) {
-  add_edge(points,x,y,z,x+width,y,z);
-  add_edge(points,x,y,z,x,y-height,z);
-  add_edge(points,x,y,z,x,y,z-depth);
-  add_edge(points,x+width,y-height,z,x,y-height,z);
-  add_edge(points,x+width,y-height,z,x+width,y,z);
-  add_edge(points,x+width,y-height,z,x+width,y-height,z-depth);
-  add_edge(points,x+width,y,z-depth,x,y,z-depth);
-  add_edge(points,x+width,y,z-depth,x+width,y-height,z-depth);
-  add_edge(points,x+width,y,z-depth,x+width,y,z);
-  add_edge(points,x,y-height,z-depth,x+width,y-height,z-depth);
-  add_edge(points,x,y-height,z-depth,x,y,z-depth);
-  add_edge(points,x,y-height,z-depth,x,y-height,z);
+  add_polygon(points,x,y,z,x,y-height,z,x+width,y,z);
+  add_polygon(points,x+width,y-height,z,x+width,y,z,x,y-height,z);
+  add_polygon(points,x+width,y,z+depth,x+width,y-height,z+depth,x,y,z+depth);
+  add_polygon(points,x,y-height,z+depth,x,y,z+depth,x+width,y-height,z+depth);
+  add_polygon(points,x,y,z+depth,x,y,z,x+width,y,z+depth);
+  add_polygon(points,x+width,y,z,x+width,y,z+depth,x,y,z);
+  add_polygon(points,x+width,y-height,z+depth,x+width,y-height,z,x,y-height,z+depth);
+  add_polygon(points,x,y-height,z,x,y-height,z+depth,x+width,y-height,z);
+  add_polygon(points,x,y,z+depth,x,y-height,z+depth,x,y,z);
+  add_polygon(points,x,y-height,z,x,y,z,x,y-height,z+depth);
+  add_polygon(points,x+width,y,z,x+width,y-height,z,x+width,y,z+depth);
+  add_polygon(points,x+width,y-height,z+depth,x+width,y,z+depth,x+width,y-height,z);
+  
 }
 
 /*======== void add_circle() ==========
