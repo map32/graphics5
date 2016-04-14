@@ -1,11 +1,9 @@
 #test box mesh
-sphere
-0 0 200
+torus
+0 0 100 200
 ident
 yrotate
-90
-xrotate
-180
+45
 translate
 200 200 0
 apply

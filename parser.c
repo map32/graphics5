@@ -129,8 +129,7 @@ void parse_file ( char * filename,
     } else if (strcmp(line, "save")==0){
       type = 9;
     } else if (strcmp(line, "clear")==0){
-      free_matrix(pm);
-      pm = new_matrix(4,100);
+      pm->lastcol = 0;
     } else if (strcmp(line, "sphere")==0){
       type = 11;
     } else if (strcmp(line, "box")==0){
@@ -182,7 +181,7 @@ void parse_file ( char * filename,
 	add_box(pm,args[0],args[1],args[2],args[3],args[4],args[5]);
         break;
       case 13:
-        add_torus(pm,args[0],args[1],args[2],args[3],0.1);
+        add_torus(pm,args[0],args[1],args[2],args[3],0.05);
         break;
       default:
 	printf("invalid command/n");
@@ -190,5 +189,6 @@ void parse_file ( char * filename,
       type = -1;
     }
   }
+  print_matrix(transform);
   fclose(f);
 }
